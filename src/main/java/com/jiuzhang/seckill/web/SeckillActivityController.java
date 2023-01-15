@@ -2,13 +2,17 @@ package com.jiuzhang.seckill.web;
 
 import com.jiuzhang.seckill.db.dao.SeckillActivityDao;
 import com.jiuzhang.seckill.db.dao.SeckillCommodityDao;
+import com.jiuzhang.seckill.db.po.Order;
 import com.jiuzhang.seckill.db.po.SeckillActivity;
 import com.jiuzhang.seckill.db.po.SeckillCommodity;
+import com.jiuzhang.seckill.services.SeckillActivityService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -16,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Controller
 public class SeckillActivityController {
 
@@ -24,6 +29,13 @@ public class SeckillActivityController {
 
     @Autowired
     private SeckillCommodityDao seckillCommodityDao;
+
+    @Autowired
+    SeckillActivityService seckillActivityService;
+
+    public static final String ORDER_SUCCESS_PROMPT = "Congratulations! Creating your order (Order ID: )";
+    public static final String ORDER_FAILURE_PROMPT = "";
+    public static final String STOCK_INSUFFICIENT_PROMPT = "";
 
     @RequestMapping("/addSeckillActivity")
     public String addSeckillActivity() {
@@ -82,6 +94,43 @@ public class SeckillActivityController {
         resultMap.put("commodityDesc", seckillCommodity.getCommodityDesc());
 
         return "seckill_item";
+    }
+
+    /**
+     * Process seckill purchase request
+     * @param userId
+     * @param seckillActivityId
+     * @return
+     */
+    @RequestMapping("/seckill/buy/{userId}/{seckillActivityId}")
+    public ModelAndView seckillCommodity(@PathVariable long userId, @PathVariable long seckillActivityId) {
+        boolean stockValidateResult = false;
+        ModelAndView modelAndView = new ModelAndView();
+
+        try {
+            // determine if seckill purchase is available
+            stockValidateResult = seckillActivityService.seckillStockValidator(seckillActivityId);
+
+            if (stockValidateResult) {
+                Order order = seckillActivityService.createOrder(seckillActivityId, userId);
+                modelAndView.addObject(
+                        "resultInfo",
+                        String.format("Congratulations! Creating your order (Order ID: %s)", order.getOrderNo())
+                );
+                modelAndView.addObject("orderNo", order.getOrderNo());
+            } else {
+                modelAndView.addObject(
+                        "resultInfo",
+                        "Sorry, the item you ordered is out of stock"
+                );
+            }
+        } catch (Exception e) {
+            log.error("System error: " + e.toString());
+            modelAndView.addObject("resultInfo", "System error: order placement failed");
+        }
+
+        modelAndView.setViewName("seckill_result");
+        return modelAndView;
     }
 
 }
