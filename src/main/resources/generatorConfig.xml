@@ -36,12 +36,23 @@ serverTimezone=GMT"
             <!-- enableSubPackages:是否让schema作为包的后缀 -->
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>
+
+<!--        for chapter 2, part 1 of sql file-->
         <table schema="" tableName="seckill_activity"
                domainObjectName="SeckillActivity" enableCountByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false"
                enableUpdateByExample="false" selectByExampleQueryId="false"></table>
         <table schema="" tableName="seckill_commodity"
                domainObjectName="SeckillCommodity" enableCountByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false"
+               enableUpdateByExample="false" selectByExampleQueryId="false"></table>
+<!--        for chapter 4, part 2 of sql file-->
+        <table schema="" tableName="seckill_order"
+               domainObjectName="Order" enableCountByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false"
+               enableUpdateByExample="false" selectByExampleQueryId="false"></table>
+        <table schema="" tableName="seckill_user"
+               domainObjectName="User" enableCountByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false"
                enableUpdateByExample="false" selectByExampleQueryId="false"></table>
     </context>
