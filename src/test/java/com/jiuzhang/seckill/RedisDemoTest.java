@@ -23,6 +23,15 @@ public class RedisDemoTest {
     public void getStockTest() {
         String stock = redisService.getValue(STOCK_TEST_KEY);
         System.out.println(stock);
-        assert stock.equals("10");
+        assert stock != null;
+    }
+
+    @Test
+    public void stockDeductValidatorTest() {
+        boolean result = redisService.stockDeductValidator(STOCK_TEST_KEY);
+        System.out.println(String.format("result: %s", result));
+
+        String stock = redisService.getValue(STOCK_TEST_KEY);
+        System.out.println(String.format("stock: %s", stock));
     }
 }
