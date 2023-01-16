@@ -182,4 +182,11 @@
     set lock_stock = lock_stock - 1
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <update id="revertStock" parameterType="java.lang.Long">
+    update seckill_activity
+    set available_stock = available_stock + 1,
+        lock_stock = lock_stock - 1
+    where id = #{id,jdbcType=BIGINT}
+  </update>
 </mapper>
