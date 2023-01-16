@@ -70,19 +70,28 @@ public class SeckillActivityService {
         return redisService.stockDeductValidator(key);
     }
 
-    public void payOrderProcess(String orderNo) {
+    public void payOrderProcess(String orderNo) throws Exception {
         log.info(String.format("Finishing payment order (order No: %s)", orderNo));
         Order order = orderDao.queryOrder(orderNo);
-        boolean deductStockResult = seckillActivityDao.deductStock(order.getSeckillActivityId());
 
+        // 1. Determine if order already exists or is "pending payment"
+        if (order == null) {
+            log.error("The orderNo provided does not exist: " + orderNo);
+            return;
+        } else if (order.getOrderStatus() != 1) {
+            log.error("Order status is not valid: " + orderNo);
+            return;
+        }
+
+        // 2. Order payment is complete
         // Order status:
         //     0 = out of stock, invalid order
         //     1 = order created, pending for payment
         //     2 = payment finished
-        if (deductStockResult) {
-            order.setPayTime(new Date());
-            order.setOrderStatus(2);
-            orderDao.updateOrder(order);
-        }
+        order.setPayTime(new Date());
+        order.setOrderStatus(2);
+        orderDao.updateOrder(order);
+
+        rocketMQService.sendMessage("pay_done", JSON.toJSONString(order));
     }
 }

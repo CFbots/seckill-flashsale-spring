@@ -7,6 +7,7 @@ import com.jiuzhang.seckill.db.po.Order;
 import com.jiuzhang.seckill.db.po.SeckillActivity;
 import com.jiuzhang.seckill.db.po.SeckillCommodity;
 import com.jiuzhang.seckill.services.SeckillActivityService;
+import com.jiuzhang.seckill.util.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,6 +34,8 @@ public class SeckillActivityController {
     SeckillActivityService seckillActivityService;
     @Autowired
     OrderDao orderDao;
+    @Autowired
+    private RedisService redisService;
 
     public static final String ORDER_SUCCESS_PROMPT = "Congratulations! Creating your order (Order ID: )";
     public static final String ORDER_FAILURE_PROMPT = "";
@@ -109,6 +112,14 @@ public class SeckillActivityController {
         ModelAndView modelAndView = new ModelAndView();
 
         try {
+            // determine if user is already in purchased list
+            if (redisService.isInLimitMember(seckillActivityId, userId)) {
+                // notifies user is already in limit list, return the result
+                modelAndView.addObject("resultInfo", "Sorry, you are already in the limit list");
+                modelAndView.setViewName("seckill_result");
+                return modelAndView;
+            }
+
             // determine if seckill purchase is available
             stockValidateResult = seckillActivityService.seckillStockValidator(seckillActivityId);
 
@@ -119,6 +130,8 @@ public class SeckillActivityController {
                         String.format("Congratulations! Creating your order (Order ID: %s)", order.getOrderNo())
                 );
                 modelAndView.addObject("orderNo", order.getOrderNo());
+                // add user to limit order as a member
+                redisService.addLimitMember(seckillActivityId, userId);
             } else {
                 modelAndView.addObject(
                         "resultInfo",
