@@ -45,19 +45,28 @@ public class TestController {
      * @PostContruct means to execute after constructor finishes
      */
     @PostConstruct
-    public void initFlowRules() {
+    public void seckillFlow() {
+        // seckills list rules
         // 1. create a set to store rules of throttling
         List<FlowRule> rules = new ArrayList<>();
         // 2. create throttling rules
         FlowRule rule = new FlowRule();
         // set up resource, so that Sentinel will be effective to the corresponding resource
-        rule.setResource("HelloResource");
+        rule.setResource("seckills");
         // define throttling rule types (type is QPS)
         rule.setGrade(RuleConstant.FLOW_GRADE_QPS);
         // define QPS = query per second to be 2
-        rule.setCount(2);
+        rule.setCount(1);
+
+        // HelloResource rules
+        FlowRule rule2 = new FlowRule();
+        rule2.setGrade(RuleConstant.FLOW_GRADE_QPS);
+        rule2.setResource("HelloResource");
+        rule2.setCount(2);
+
         // 3. put rules into the set
         rules.add(rule);
+        rules.add(rule2);
         // load the rules
         FlowRuleManager.loadRules(rules);
     }
