@@ -3,8 +3,10 @@ package com.jiuzhang.seckill.services;
 import com.alibaba.fastjson.JSON;
 import com.jiuzhang.seckill.db.dao.OrderDao;
 import com.jiuzhang.seckill.db.dao.SeckillActivityDao;
+import com.jiuzhang.seckill.db.dao.SeckillCommodityDao;
 import com.jiuzhang.seckill.db.po.Order;
 import com.jiuzhang.seckill.db.po.SeckillActivity;
+import com.jiuzhang.seckill.db.po.SeckillCommodity;
 import com.jiuzhang.seckill.mq.RocketMQService;
 import com.jiuzhang.seckill.util.RedisService;
 import com.jiuzhang.seckill.util.SnowFlake;
@@ -21,6 +23,8 @@ public class SeckillActivityService {
     private RedisService redisService;
     @Autowired
     private SeckillActivityDao seckillActivityDao;
+    @Autowired
+    private SeckillCommodityDao seckillCommodityDao;
     @Autowired
     private RocketMQService rocketMQService;
     @Autowired
@@ -68,6 +72,14 @@ public class SeckillActivityService {
     public boolean seckillStockValidator(long activityId) {
         String key = "stock:" + activityId;
         return redisService.stockDeductValidator(key);
+    }
+
+    public void pushSeckillInfoToRedis(long seckillActivityId) {
+        SeckillActivity seckillActivity = seckillActivityDao.querySeckillActivityById(seckillActivityId);
+        redisService.setValue("seckillActivity:" + seckillActivityId, JSON.toJSONString(seckillActivity));
+
+        SeckillCommodity seckillCommodity = seckillCommodityDao.querySeckillCommodityById(seckillActivity.getCommodityId());
+        redisService.setValue("seckillCommodity:" + seckillActivity.getCommodityId(), JSON.toJSONString(seckillCommodity));
     }
 
     public void payOrderProcess(String orderNo) throws Exception {

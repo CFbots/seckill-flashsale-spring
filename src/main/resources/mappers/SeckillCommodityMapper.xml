@@ -11,7 +11,7 @@
     id, commodity_name, commodity_desc, commodity_price
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from seckill_commodity
     where id = #{id,jdbcType=BIGINT}
@@ -21,10 +21,10 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.jiuzhang.seckill.db.po.SeckillCommodity">
-    insert into seckill_commodity (id, commodity_name, commodity_desc, 
-      commodity_price)
-    values (#{id,jdbcType=BIGINT}, #{commodityName,jdbcType=VARCHAR}, #{commodityDesc,jdbcType=VARCHAR}, 
-      #{commodityPrice,jdbcType=INTEGER})
+    insert into seckill_commodity (id, commodity_name, commodity_desc,
+                                   commodity_price)
+    values (#{id,jdbcType=BIGINT}, #{commodityName,jdbcType=VARCHAR}, #{commodityDesc,jdbcType=VARCHAR},
+            #{commodityPrice,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.jiuzhang.seckill.db.po.SeckillCommodity">
     insert into seckill_commodity
@@ -75,8 +75,8 @@
   <update id="updateByPrimaryKey" parameterType="com.jiuzhang.seckill.db.po.SeckillCommodity">
     update seckill_commodity
     set commodity_name = #{commodityName,jdbcType=VARCHAR},
-      commodity_desc = #{commodityDesc,jdbcType=VARCHAR},
-      commodity_price = #{commodityPrice,jdbcType=INTEGER}
+        commodity_desc = #{commodityDesc,jdbcType=VARCHAR},
+        commodity_price = #{commodityPrice,jdbcType=INTEGER}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

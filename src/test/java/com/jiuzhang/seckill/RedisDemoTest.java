@@ -1,7 +1,9 @@
 package com.jiuzhang.seckill;
 
+import com.jiuzhang.seckill.services.SeckillActivityService;
 import com.jiuzhang.seckill.util.RedisService;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
@@ -11,6 +13,8 @@ import javax.annotation.Resource;
 public class RedisDemoTest {
     @Resource
     private RedisService redisService;
+    @Autowired
+    SeckillActivityService seckillActivityService;
 
     final String STOCK_TEST_KEY = "stock:19";
 
@@ -33,5 +37,10 @@ public class RedisDemoTest {
 
         String stock = redisService.getValue(STOCK_TEST_KEY);
         System.out.println(String.format("stock: %s", stock));
+    }
+
+    @Test
+    public void pushSeckillInfoToRedisTest() {
+        seckillActivityService.pushSeckillInfoToRedis(11);
     }
 }
