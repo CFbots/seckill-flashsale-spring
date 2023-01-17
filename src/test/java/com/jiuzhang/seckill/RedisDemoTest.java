@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
+import java.util.UUID;
 
 // remember to get add the SpringBootTest!
 @SpringBootTest
@@ -42,5 +43,26 @@ public class RedisDemoTest {
     @Test
     public void pushSeckillInfoToRedisTest() {
         seckillActivityService.pushSeckillInfoToRedis(11);
+    }
+
+    @Test
+    public void concurrentlyAddLockTest() {
+        for (int i = 0; i < 10; i++) {
+            String requestId = UUID.randomUUID().toString();
+            // print result: T F F F F F F F F F
+            // only the first can acquire the lock
+            System.out.println(redisService.tryGetDistributedLock("A", requestId, 1000));
+        }
+    }
+
+    @Test
+    public void concurrentlyAddLockThenReleaseTest() {
+        for (int i = 0; i < 10; i++) {
+            String requestId = UUID.randomUUID().toString();
+            // print result: T T T T T T T T T T
+            // only the first can acquire the lock
+            System.out.println(redisService.tryGetDistributedLock("A", requestId, 1000));
+            redisService.releaseDistributedLock("A", requestId);
+        }
     }
 }
